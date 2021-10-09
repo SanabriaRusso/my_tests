@@ -9,12 +9,11 @@ on:
 jobs:
 
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
+    - name: Check Out repo
+      uses: actions/checkout@v2
     - name: Build the Docker image
-      with:
-        path: src
       run: docker build . --file Dockerfile --tag hello-world-1:$(date +%s)
+      with:
+        path: src/
