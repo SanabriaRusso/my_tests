@@ -13,7 +13,5 @@ jobs:
     steps:
     - name: Check Out repo
       uses: actions/checkout@v2
-      with:
-        path: src
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag hello-world-1:$(date +%s)
