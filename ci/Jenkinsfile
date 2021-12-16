@@ -1,9 +1,20 @@
 pipeline {
-    agent { docker { image 'python:3.10.1-alpine' } }
+    agent {
+        kubernetes {
+            containerTemplate {
+                name 'my-agent'
+                image 'python:3.10.1-alpine'
+                command 'sleep'
+                args '3600'
+            }
+        }
+    }
     stages {
-        stage('build') {
+        stage('Get Python version') {
             steps {
-                sh 'python --version'
+                container(name: 'my-agent', shell: '/bin/bash') {
+                    sh 'python --version'
+                }
             }
         }
     }
