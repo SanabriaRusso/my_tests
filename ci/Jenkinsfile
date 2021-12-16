@@ -12,8 +12,8 @@ pipeline {
     stages {
         stage('Get Python version') {
             steps {
-                container(name: 'my-agent', shell: '/bin/bash') {
-                    'echo Hello'
+                container('my-agent') {
+                    sh 'echo Hello'
                 }
             }
         }
