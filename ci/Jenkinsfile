@@ -13,7 +13,7 @@ pipeline {
         stage('Get Python version') {
             steps {
                 container('my-agent') {
-                    sh 'echo Hello'
+                    sh 'python3 --version'
                 }
             }
         }
