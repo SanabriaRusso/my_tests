@@ -49,8 +49,7 @@ spec:
         git url: 'https://github.com/SanabriaRusso/my_tests.git', branch: 'main'
         container('podman') {
           sh '''
-            ls -la
-            echo -e 'FROM busybox\nRUN echo "hello world"' | podman --events-backend=file build -t  sanabriarusso/hello-world:latest -
+            podman --events-backend=file build -t sanabriarusso/hello-world:latest .
           '''
         }
       }
