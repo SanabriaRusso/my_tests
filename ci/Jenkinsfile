@@ -20,6 +20,9 @@ spec:
       tty: true
       securityContext:
         privileged: true
+      env:
+        - name: REGISTRY_AUTH_FILE
+          value: /dockerconfig.json
       volumeMounts:
         - mountPath: /var/lib/containers
           name: podman-volume
@@ -29,6 +32,8 @@ spec:
           name: varrun-volume
         - mountPath: /tmp
           name: tmp-volume
+        - mountPath: /
+          name: dockerhub
   restartPolicy: Never
   volumes:
     - name: podman-volume
@@ -40,6 +45,9 @@ spec:
       name: varrun-volume
     - emptyDir: {}
       name: tmp-volume
+    - name: dockerhub
+      secret:
+        secretName: dockerhub
       '''
       }
   }
@@ -49,6 +57,7 @@ spec:
         git url: 'https://github.com/SanabriaRusso/my_tests.git', branch: 'main'
         container('podman') {
           sh '''
+            podman login docker.io
             podman --events-backend=file build -t sanabriarusso/hello-world:latest .
           '''
         }
