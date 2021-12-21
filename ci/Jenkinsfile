@@ -14,7 +14,9 @@ spec:
       imagePullPolicy: Always
       image: quay.io/podman/stable:v3.4.4
       command:
-        - cat
+        - sleep
+      args:
+        - 99d
       tty: true
       securityContext:
         privileged: true
@@ -44,8 +46,10 @@ spec:
   stages {
     stage('Podman Build') {
       steps {
+        git url: 'https://github.com/SanabriaRusso/my_tests.git', branch: 'main'
         container('podman') {
           sh '''
+            ls -la
             echo -e 'FROM busybox\nRUN echo "hello world"' | podman --events-backend=file build -t  sanabriarusso/hello-world:latest -
           '''
         }
