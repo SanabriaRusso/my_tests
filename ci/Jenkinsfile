@@ -1,21 +1,56 @@
 pipeline {
-    agent {
-        kubernetes {
-            containerTemplate {
-                name 'my-agent'
-                image 'python:3.10.1-alpine'
-                command 'sleep'
-                args '3600'
-            }
+  agent {
+    kubernetes {
+    label 'kubernetes'
+    defaultContainer 'podman'
+    yaml '''
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: "jenkins"
+spec:
+  containers:
+    - name: podman
+      imagePullPolicy: Always
+      image: docker.io/mysticrenji/podman:v3.4.4
+      command:
+        - cat
+      tty: true
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - mountPath: /var/lib/containers
+          name: podman-volume
+        - mountPath: /dev/shm
+          name: devshm-volume
+        - mountPath: /var/run
+          name: varrun-volume
+        - mountPath: /tmp
+          name: tmp-volume
+  restartPolicy: Never
+  volumes:
+    - name: podman-volume
+      emptyDir: {}
+    - emptyDir:
+        medium: Memory
+      name: devshm-volume
+    - emptyDir: {}
+      name: varrun-volume
+    - emptyDir: {}
+      name: tmp-volume
+      '''
+      }
+  }
+  stages {
+    stage('Podman Build') {
+      steps {
+        container('podman') {
+          sh '''
+            echo -e 'FROM busybox\nRUN echo "hello world"' | podman --events-backend=file build -t  sanabriarusso/hello-world:latest -
+          '''
         }
+      }
     }
-    stages {
-        stage('Get Python version') {
-            steps {
-                container('my-agent') {
-                    sh 'python3 --version'
-                }
-            }
-        }
-    }
+  }
 }
