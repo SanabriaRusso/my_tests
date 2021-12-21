@@ -22,7 +22,7 @@ spec:
         privileged: true
       env:
         - name: REGISTRY_AUTH_FILE
-          value: /dockerconfig.json
+          value: /tmp/auth.json
       volumeMounts:
         - mountPath: /var/lib/containers
           name: podman-volume
@@ -30,10 +30,9 @@ spec:
           name: devshm-volume
         - mountPath: /var/run
           name: varrun-volume
-        - mountPath: /tmp
-          name: tmp-volume
-        - mountPath: /
+        - mountPath: /tmp/
           name: dockerhub
+          readOnly: true
   restartPolicy: Never
   volumes:
     - name: podman-volume
@@ -43,11 +42,12 @@ spec:
       name: devshm-volume
     - emptyDir: {}
       name: varrun-volume
-    - emptyDir: {}
-      name: tmp-volume
     - name: dockerhub
       secret:
         secretName: dockerhub
+        items:
+          - key: .dockerconfigjson
+            path: auth.json
       '''
       }
   }
@@ -59,6 +59,7 @@ spec:
           sh '''
             podman login docker.io
             podman --events-backend=file build -t sanabriarusso/hello-world:latest .
+            podman push sanabriarusso/hello-world:latest
           '''
         }
       }
